@@ -8,23 +8,50 @@ class UsuarioController < ApplicationController
 	def create
 		@usuario = Usuario.new (usuario_params)
 
-		@usuario.save
-		render json: @usuario, status: :created
+
+		if @usuario.save
+			render json: @usuario, status: 201
+			
+		else
+			render json: {error: 'La creación ha fallado.'}, status: 500
+		end
 	end
 
 	def destroy
 		@usuario = Usuario.where(id: params[:id]).first
-		if @usuario.destroy
-			head(:ok)
+		if @usuario
+			if @usuario.destroy
+				render status: 204
+			else
+				render json: {error: 'La eliminación ha fallado'}, status: 500
+			end
 		else
-			head(:unprocessable_entity)
+			render json: {error: 'Usuario no encontrado'}, status: 404	
 		end
 	end
-
+ 	
 	def show
 		@usuario = Usuario.where(id: params[:id]).first
 
-		render json: @usuario, status: :ok
+		if @usuario
+			render json: @usuario, status: 200
+		else
+			render json: {error: 'Usuario no encontrado'}, status: 404
+		end
+	end
+
+	def edit
+		@usuario = Usuario.where(id: params[:id]).first
+		if @usuario
+			if @usuario.update_attributes(usuario_params)
+				render json: @usuario, status: :ok
+			else
+				render json: {error: 'La modificación ha fallado'}, status: 500
+			end
+		else
+			render json: {error: 'Usuario no encontrado'}, status: 404		
+		end
+
 	end
 
 	private
