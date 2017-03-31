@@ -1,19 +1,20 @@
 class UsuarioController < ApplicationController
 	def index
 		@usuarios = Usuario.all
-
-		render json: @usuarios, status: :ok
 	end
 
 	def create
 		@usuario = Usuario.new (usuario_params)
 
-
-		if @usuario.save
-			render json: @usuario, status: 201
-			
+		if params[:usuario][:id]
+			render json: {error: 'No se puede crear usuario con id'}, status: 400
 		else
-			render json: {error: 'La creación ha fallado.'}, status: 500
+			if @usuario.save
+				render json: @usuario.to_json, status: 201
+				
+			else
+				render json: {error: 'La creación ha fallado.'}, status: 500
+			end
 		end
 	end
 
@@ -21,7 +22,7 @@ class UsuarioController < ApplicationController
 		@usuario = Usuario.where(id: params[:id]).first
 		if @usuario
 			if @usuario.destroy
-				render status: 204
+				render json: {}, status: 204
 			else
 				render json: {error: 'La eliminación ha fallado'}, status: 500
 			end
@@ -34,23 +35,29 @@ class UsuarioController < ApplicationController
 		@usuario = Usuario.where(id: params[:id]).first
 
 		if @usuario
-			render json: @usuario, status: 200
+			render json: @usuario.to_json, status: 200
 		else
 			render json: {error: 'Usuario no encontrado'}, status: 404
 		end
 	end
 
 	def edit
-		@usuario = Usuario.where(id: params[:id]).first
+		@usuario = Usuario.where(id: params[:uid]).first
+
 		if @usuario
-			if @usuario.update_attributes(usuario_params)
-				render json: @usuario, status: :ok
+			if params[:usuario][:id]
+				render json: {error: 'id no es modificable'}, status: 400
 			else
-				render json: {error: 'La modificación ha fallado'}, status: 500
+				if @usuario.update_attributes(usuario_params)
+					render json: @usuario.to_json, status: :ok
+				else
+					render json: {error: 'La modificación ha fallado'}, status: 500
+				end
 			end
 		else
 			render json: {error: 'Usuario no encontrado'}, status: 404		
 		end
+		
 
 	end
 

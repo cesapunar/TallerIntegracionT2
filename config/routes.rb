@@ -4,6 +4,6 @@ Rails.application.routes.draw do
 
 	put '/usuario' => 'usuario#create'
 
-	post '/usuario/:id' => 'usuario#edit'
+	post '/usuario/:uid' => 'usuario#edit'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
